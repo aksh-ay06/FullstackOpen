@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { PersonForm,Persons,Filter } from './Components';
+import { PersonForm,Persons,Filter,Notification } from './Components';
 import PersonsService from './services/PersonsService';
 
 const App = () => {
@@ -7,10 +7,20 @@ const App = () => {
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [filter, setFilter] = useState('');
+  const [notification, setNotification] = useState(null);
 
   useEffect(()=>{
     PersonsService.getAll().then(person=>setPersons(person));
   },[])
+
+  const showNotification = (message) => {
+    setNotification(message);
+
+    // Clear the notification after a few seconds
+    setTimeout(() => {
+      setNotification(null);
+    }, 3000); // 3000 milliseconds (3 seconds)
+  };
 
   const addName = (event) => {
     event.preventDefault();
@@ -31,6 +41,7 @@ const App = () => {
               );
               setNewName('');
               setNewNumber('');
+              showNotification(`Updated ${newName}'s number.`);
             }
           );
         }
@@ -43,6 +54,7 @@ const App = () => {
           setPersons([...persons, returnedObject]);
           setNewName('');
           setNewNumber('');
+          showNotification(`Added ${newName}.`);
         });
       }
     }
@@ -71,6 +83,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notification} />
       <Filter filter={filter} handleFilterChange={handleFilterChange} />
 
       <h3>Add a new contact</h3>
